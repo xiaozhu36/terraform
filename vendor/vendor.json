@@ -225,6 +225,12 @@
 			"revisionTime": "2015-08-30T18:26:16Z"
 		},
 		{
+			"checksumSHA1": "xNiRtLQvp6xubE11KUpKY5vB6KA=",
+			"path": "github.com/aliyun/aliyun-oss-go-sdk/oss",
+			"revision": "52de7239022ceba47354832fbcc65983aa8d019d",
+			"revisionTime": "2017-12-13T06:10:34Z"
+		},
+		{
 			"checksumSHA1": "taUAhOa8gx2Hxqo32pXQWhi7Bhg=",
 			"path": "github.com/antchfx/xpath",
 			"revision": "b5c552e1acbdd77b5e369eab0efd1e0f9d7090e4",
@@ -1139,6 +1145,24 @@
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
 			"revisionTime": "2016-10-29T20:57:26Z"
+		},
+		{
+			"checksumSHA1": "qvFutFkayxTxJN3E1AENo4kHEzA=",
+			"path": "github.com/denverdino/aliyungo/common",
+			"revision": "df1711e43f18d55672c2ca12b3a27a1a2d753aa6",
+			"revisionTime": "2017-12-14T00:42:06Z"
+		},
+		{
+			"checksumSHA1": "CPuR3s7LzQkT57Z20zMHXQM2MYQ=",
+			"path": "github.com/denverdino/aliyungo/location",
+			"revision": "df1711e43f18d55672c2ca12b3a27a1a2d753aa6",
+			"revisionTime": "2017-12-14T00:42:06Z"
+		},
+		{
+			"checksumSHA1": "cKVBRn7GKT+0IqfGUc/NnKDWzCw=",
+			"path": "github.com/denverdino/aliyungo/util",
+			"revision": "df1711e43f18d55672c2ca12b3a27a1a2d753aa6",
+			"revisionTime": "2017-12-14T00:42:06Z"
 		},
 		{
 			"checksumSHA1": "yDQQpeUxwqB3C+4opweg6znWJQk=",
