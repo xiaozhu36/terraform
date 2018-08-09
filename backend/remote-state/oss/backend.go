@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"log"
+	"time"
 )
 
 // New creates a new backend for OSS remote state.
@@ -154,10 +155,11 @@ func (b *Backend) configure(ctx context.Context) error {
 	endpoint := os.Getenv("OSS_ENDPOINT")
 	if endpoint == "" {
 		region := common.Region(d.Get("region").(string))
-		if end, err := b.getOSSEndpointByRegion(access_key, secret_key, security_token, region); err != nil {
-			return err
+		if end, err := b.getOSSEndpointByRegion(access_key, secret_key, security_token, region); end != "" {
+			endpoint = endpoint
 		} else {
-			endpoint = end
+			log.Printf("[DEBUG] Describe OSS endpoint got an error: %#v", err)
+			endpoint = fmt.Sprintf("oss-%s.aliyuncs.com", string(region))
 		}
 	}
 
@@ -181,21 +183,70 @@ func (b *Backend) getOSSEndpointByRegion(access_key, secret_key, security_token 
 
 	endpointClient := location.NewClient(access_key, secret_key)
 	endpointClient.SetSecurityToken(security_token)
-	endpoints, err := endpointClient.DescribeEndpoints(&location.DescribeEndpointsArgs{
-		Id:          region,
-		ServiceCode: "oss",
-		Type:        "openAPI",
-	})
-	if err != nil {
+	var endpointResp *location.DescribeEndpointsResponse
+	invoker := NewInvoker()
+	if err := invoker.Run(func() error {
+		resp, err := endpointClient.DescribeEndpoints(&location.DescribeEndpointsArgs{
+			Id:          region,
+			ServiceCode: "oss",
+			Type:        "openAPI",
+		})
+		endpointResp = resp
+		return err
+	}); err != nil {
 		return "", fmt.Errorf("Describe endpoint using region: %#v got an error: %#v.", region, err)
 	}
-	endpointItem := endpoints.Endpoints.Endpoint
+	endpointItem := endpointResp.Endpoints.Endpoint
 	endpoint := ""
 	if endpointItem != nil && len(endpointItem) > 0 {
 		endpoint = endpointItem[0].Endpoint
-	} else {
-		endpoint = fmt.Sprintf("oss-%s.aliyuncs.com", string(region))
 	}
 
 	return endpoint, nil
+}
+
+type Invoker struct {
+	catchers []*Catcher
+}
+
+type Catcher struct {
+	Reason           string
+	RetryCount       int
+	RetryWaitSeconds int
+}
+
+var ClientErrorCatcher = Catcher{"AliyunGoClientFailure", 10, 3}
+var ServiceBusyCatcher = Catcher{"ServiceUnavailable", 10, 3}
+
+func NewInvoker() Invoker {
+	i := Invoker{}
+	i.AddCatcher(ClientErrorCatcher)
+	i.AddCatcher(ServiceBusyCatcher)
+	return i
+}
+
+func (a *Invoker) AddCatcher(catcher Catcher) {
+	a.catchers = append(a.catchers, &catcher)
+}
+
+func (a *Invoker) Run(f func() error) error {
+	err := f()
+
+	if err == nil {
+		return nil
+	}
+
+	for _, catcher := range a.catchers {
+		if strings.Contains(err.Error(), catcher.Reason) {
+			catcher.RetryCount--
+
+			if catcher.RetryCount <= 0 {
+				return fmt.Errorf("Retry timeout and got an error: %#v.", err)
+			} else {
+				time.Sleep(time.Duration(catcher.RetryWaitSeconds) * time.Second)
+				return a.Run(f)
+			}
+		}
+	}
+	return err
 }
