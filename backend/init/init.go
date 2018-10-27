@@ -20,6 +20,7 @@ import (
 	backendhttp "github.com/hashicorp/terraform/backend/remote-state/http"
 	backendinmem "github.com/hashicorp/terraform/backend/remote-state/inmem"
 	backendManta "github.com/hashicorp/terraform/backend/remote-state/manta"
+	backendOSS "github.com/hashicorp/terraform/backend/remote-state/oss"
 	backendS3 "github.com/hashicorp/terraform/backend/remote-state/s3"
 	backendSwift "github.com/hashicorp/terraform/backend/remote-state/swift"
 
@@ -57,6 +58,7 @@ func Init(services *disco.Disco) {
 		"etcdv3":      func() backend.Backend { return backendetcdv3.New() },
 		"gcs":         func() backend.Backend { return backendGCS.New() },
 		"manta":       func() backend.Backend { return backendManta.New() },
+		"oss":         func() backend.Backend { return backendOSS.New() },
 
 		"azure": func() backend.Backend {
 			return deprecateBackend(
