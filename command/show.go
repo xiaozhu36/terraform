@@ -23,7 +23,6 @@ type ShowCommand struct {
 }
 
 func (c *ShowCommand) Run(args []string) int {
-
 	args, err := c.Meta.process(args, false)
 	if err != nil {
 		return 1
@@ -173,9 +172,6 @@ Usage: terraform show [options] [path]
   form. If no path is specified, the current state will be shown.
 
 Options:
-
-  -module-depth=n     Specifies the depth of modules to show in the output.
-                      By default this is -1, which will expand all.
 
   -no-color           If specified, output won't contain any color.
 

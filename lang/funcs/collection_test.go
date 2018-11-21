@@ -164,7 +164,23 @@ func TestLength(t *testing.T) {
 			cty.NumberIntVal(0),
 		},
 		{
+			cty.UnknownVal(cty.EmptyTuple),
+			cty.NumberIntVal(0),
+		},
+		{
 			cty.TupleVal([]cty.Value{cty.True}),
+			cty.NumberIntVal(1),
+		},
+		{
+			cty.EmptyObjectVal,
+			cty.NumberIntVal(0),
+		},
+		{
+			cty.UnknownVal(cty.EmptyObject),
+			cty.NumberIntVal(0),
+		},
+		{
+			cty.ObjectVal(map[string]cty.Value{"true": cty.True}),
 			cty.NumberIntVal(1),
 		},
 		{
@@ -1002,21 +1018,55 @@ func TestKeys(t *testing.T) {
 				"hello":   cty.NumberIntVal(1),
 				"goodbye": cty.StringVal("adieu"),
 			}),
-			cty.ListVal([]cty.Value{
+			cty.TupleVal([]cty.Value{
 				cty.StringVal("goodbye"),
 				cty.StringVal("hello"),
 			}),
 			false,
 		},
-		{ // Not a map
+		{ // for an unknown object we can still return the keys, since they are part of the type
+			cty.UnknownVal(cty.Object(map[string]cty.Type{
+				"hello":   cty.Number,
+				"goodbye": cty.String,
+			})),
+			cty.TupleVal([]cty.Value{
+				cty.StringVal("goodbye"),
+				cty.StringVal("hello"),
+			}),
+			false,
+		},
+		{ // an empty object has no keys
+			cty.EmptyObjectVal,
+			cty.EmptyTupleVal,
+			false,
+		},
+		{ // an empty map has no keys, but the result should still be properly typed
+			cty.MapValEmpty(cty.Number),
+			cty.ListValEmpty(cty.String),
+			false,
+		},
+		{ // Unknown map has unknown keys
+			cty.UnknownVal(cty.Map(cty.String)),
+			cty.UnknownVal(cty.List(cty.String)),
+			false,
+		},
+		{ // Not a map at all, so invalid
 			cty.StringVal("foo"),
 			cty.NilVal,
 			true,
 		},
-		{ // Unknown map
-			cty.UnknownVal(cty.Map(cty.String)),
-			cty.UnknownVal(cty.List(cty.String)),
-			false,
+		{ // Can't get keys from a null object
+			cty.NullVal(cty.Object(map[string]cty.Type{
+				"hello":   cty.Number,
+				"goodbye": cty.String,
+			})),
+			cty.NilVal,
+			true,
+		},
+		{ // Can't get keys from a null map
+			cty.NullVal(cty.Map(cty.Number)),
+			cty.NilVal,
+			true,
 		},
 	}
 
@@ -1271,7 +1321,7 @@ func TestLookup(t *testing.T) {
 				}),
 				cty.UnknownVal(cty.String),
 			},
-			cty.UnknownVal(cty.String),
+			cty.DynamicVal, // if the key is unknown then we don't know which object attribute and thus can't know the type
 			false,
 		},
 	}
@@ -1999,13 +2049,29 @@ func TestValues(t *testing.T) {
 		},
 		{
 			cty.ObjectVal(map[string]cty.Value{
-				"hello":  cty.StringVal("world"),
 				"what's": cty.StringVal("up"),
+				"hello":  cty.StringVal("world"),
 			}),
 			cty.TupleVal([]cty.Value{
 				cty.StringVal("world"),
 				cty.StringVal("up"),
 			}),
+			false,
+		},
+		{ // empty object
+			cty.EmptyObjectVal,
+			cty.EmptyTupleVal,
+			false,
+		},
+		{
+			cty.UnknownVal(cty.Object(map[string]cty.Type{
+				"what's": cty.String,
+				"hello":  cty.Bool,
+			})),
+			cty.UnknownVal(cty.Tuple([]cty.Type{
+				cty.Bool,
+				cty.String,
+			})),
 			false,
 		},
 		{ // note ordering: keys are sorted first
@@ -2035,12 +2101,20 @@ func TestValues(t *testing.T) {
 				"hello":  cty.ListVal([]cty.Value{cty.StringVal("world")}),
 				"what's": cty.UnknownVal(cty.List(cty.String)),
 			}),
-			cty.UnknownVal(cty.List(cty.List(cty.String))),
+			cty.ListVal([]cty.Value{
+				cty.ListVal([]cty.Value{cty.StringVal("world")}),
+				cty.UnknownVal(cty.List(cty.String)),
+			}),
 			false,
 		},
 		{ // empty m
 			cty.MapValEmpty(cty.DynamicPseudoType),
 			cty.ListValEmpty(cty.DynamicPseudoType),
+			false,
+		},
+		{ // unknown m
+			cty.UnknownVal(cty.Map(cty.String)),
+			cty.UnknownVal(cty.List(cty.String)),
 			false,
 		},
 	}

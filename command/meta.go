@@ -26,7 +26,6 @@ import (
 	"github.com/hashicorp/terraform/helper/wrappedstreams"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/hashicorp/terraform/provisioners"
-	"github.com/hashicorp/terraform/svchost/auth"
 	"github.com/hashicorp/terraform/svchost/disco"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/hashicorp/terraform/tfdiags"
@@ -51,10 +50,6 @@ type Meta struct {
 	// Services provides access to remote endpoint information for
 	// "terraform-native' services running at a specific user-facing hostname.
 	Services *disco.Disco
-
-	// Credentials provides access to credentials for "terraform-native"
-	// services, which are accessed by a service hostname.
-	Credentials auth.CredentialsSource
 
 	// RunningInAutomation indicates that commands are being run by an
 	// automated system rather than directly at a command prompt.
@@ -418,7 +413,9 @@ func (m *Meta) moduleStorage(root string, mode module.GetMode) *module.Storage {
 // will potentially modify the args in-place. It will return the resulting
 // slice.
 //
-// vars says whether or not we support variables.
+// vars is now ignored. It used to control whether to process variables, but
+// that is no longer the responsibility of this function. (That happens
+// instead in Meta.collectVariableValues.)
 func (m *Meta) process(args []string, vars bool) ([]string, error) {
 	// We do this so that we retain the ability to technically call
 	// process multiple times, even if we have no plans to do so
@@ -509,25 +506,6 @@ func (m *Meta) showDiagnostics(vals ...interface{}) {
 			m.Ui.Warn(msg)
 		default:
 			m.Ui.Output(msg)
-		}
-	}
-}
-
-const (
-	// ModuleDepthDefault is the default value for
-	// module depth, which can be overridden by flag
-	// or env var
-	ModuleDepthDefault = -1
-
-	// ModuleDepthEnvVar is the name of the environment variable that can be used to set module depth.
-	ModuleDepthEnvVar = "TF_MODULE_DEPTH"
-)
-
-func (m *Meta) addModuleDepthFlag(flags *flag.FlagSet, moduleDepth *int) {
-	flags.IntVar(moduleDepth, "module-depth", ModuleDepthDefault, "module-depth")
-	if envVar := os.Getenv(ModuleDepthEnvVar); envVar != "" {
-		if md, err := strconv.Atoi(envVar); err == nil {
-			*moduleDepth = md
 		}
 	}
 }

@@ -53,7 +53,7 @@ func testStep(opts terraform.ContextOpts, state *terraform.State, step TestStep,
 	}
 	if stepDiags := ctx.Validate(); len(stepDiags) > 0 {
 		if stepDiags.HasErrors() {
-			return nil, errwrap.Wrapf("config is invalid: {{err}}", stepDiags.Err())
+			return state, errwrap.Wrapf("config is invalid: {{err}}", stepDiags.Err())
 		}
 
 		log.Printf("[WARN] Config warnings:\n%s", stepDiags)
@@ -77,7 +77,7 @@ func testStep(opts terraform.ContextOpts, state *terraform.State, step TestStep,
 		}
 
 		// We need to keep a copy of the state prior to destroying
-		// such that destroy steps can verify their behaviour in the check
+		// such that destroy steps can verify their behavior in the check
 		// function
 		stateBeforeApplication := state.DeepCopy()
 
