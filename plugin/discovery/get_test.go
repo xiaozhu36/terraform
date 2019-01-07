@@ -237,7 +237,7 @@ func TestProviderInstallerGet(t *testing.T) {
 
 	// attempt to use an incompatible protocol version
 	i := &ProviderInstaller{
-		Dir:                   tmpDir,
+		Dir: tmpDir,
 		PluginProtocolVersion: 5,
 		SkipVerify:            true,
 		Ui:                    cli.NewMockUi(),
@@ -250,7 +250,7 @@ func TestProviderInstallerGet(t *testing.T) {
 	}
 
 	i = &ProviderInstaller{
-		Dir:                   tmpDir,
+		Dir: tmpDir,
 		PluginProtocolVersion: 4,
 		SkipVerify:            true,
 		Ui:                    cli.NewMockUi(),
@@ -328,7 +328,7 @@ func TestProviderInstallerPurgeUnused(t *testing.T) {
 	f.Close()
 
 	i := &ProviderInstaller{
-		Dir:                   tmpDir,
+		Dir: tmpDir,
 		PluginProtocolVersion: 3,
 		SkipVerify:            true,
 		Ui:                    cli.NewMockUi(),

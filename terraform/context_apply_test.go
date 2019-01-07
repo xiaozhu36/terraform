@@ -8792,8 +8792,8 @@ func TestContext2Apply_issue5254(t *testing.T) {
 				Attributes: map[string]*configschema.Attribute{
 					"template":                {Type: cty.String, Optional: true},
 					"__template_requires_new": {Type: cty.Bool, Optional: true},
-					"id":                      {Type: cty.String, Computed: true},
-					"type":                    {Type: cty.String, Computed: true},
+					"id":   {Type: cty.String, Computed: true},
+					"type": {Type: cty.String, Computed: true},
 				},
 			},
 		},

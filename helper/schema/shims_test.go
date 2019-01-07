@@ -2342,7 +2342,7 @@ func TestShimSchemaMap_Diff(t *testing.T) {
 			State: &terraform.InstanceState{
 				ID: "id",
 				Attributes: map[string]string{
-					"block_device.#": "2",
+					"block_device.#":                                "2",
 					"block_device.616397234.delete_on_termination":  "true",
 					"block_device.616397234.device_name":            "/dev/sda1",
 					"block_device.2801811477.delete_on_termination": "true",
