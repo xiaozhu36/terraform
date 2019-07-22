@@ -90,6 +90,18 @@ The following configuration options or environment variables are supported:
  * `acl` - (Optional) [Object
    ACL](https://www.alibabacloud.com/help/doc-detail/52284.htm)
    to be applied to the state file.
+ * `assume_role` - (Optional) If provided with a role ARN, will attempt to assume this role using the supplied credentials.
+ 
+The nested `assume_role` block supports the following:
+* `role_arn` - (Required) The ARN of the role to assume. If ARN is set to an empty string, it does not perform role switching.
+  Terraform executes configuration on account with provided credentials.
+
+* `policy` - (Optional) A more restrictive policy to apply to the temporary credentials. This gives you a way to further restrict the permissions for the resulting temporary
+  security credentials. You cannot use the passed policy to grant permissions that are in excess of those allowed by the access policy of the role that is being assumed.
+
+* `session_name` - (Optional) The session name to use when assuming the role. If omitted, 'terraform' is passed to the AssumeRole call as session name.
+
+* `session_expiration` - (Optional) The time after which the established session for assuming role expires. Valid value range: [900-3600] seconds. Default to 3600 (in this case Alicloud use own default value).
 
 -> **Note:** If you want to store state in the custom OSS endpoint, you can specify a environment variable `OSS_ENDPOINT`, like "oss-cn-beijing-internal.aliyuncs.com"
 
