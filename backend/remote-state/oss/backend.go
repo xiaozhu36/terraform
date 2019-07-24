@@ -222,11 +222,11 @@ func (b *Backend) configure(ctx context.Context) error {
 			sessionName := assumeRole["session_name"].(string)
 			policy := assumeRole["policy"].(string)
 			sessionExpiration := assumeRole["session_expiration"].(int)
-			subAccessKeyId, subAccessKeySecret, err := getAssumeRoleAK(accessKey, secretKey, region, roleArn, sessionName, policy, sessionExpiration)
+			subAccessKeyId, subAccessKeySecret, subSecurityToken, err := getAssumeRoleAK(accessKey, secretKey, region, roleArn, sessionName, policy, sessionExpiration)
 			if err != nil {
 				return err
 			}
-			accessKey, secretKey = subAccessKeyId, subAccessKeySecret
+			accessKey, secretKey, securityToken = subAccessKeyId, subAccessKeySecret, subSecurityToken
 		}
 	}
 
@@ -293,7 +293,7 @@ func (b *Backend) getOSSEndpointByRegion(access_key, secret_key, security_token,
 	return endpointsResponse, nil
 }
 
-func getAssumeRoleAK(accessKey, secretKey, region, roleArn, sessionName, policy string, sessionExpiration int) (string, string, error) {
+func getAssumeRoleAK(accessKey, secretKey, region, roleArn, sessionName, policy string, sessionExpiration int) (string, string, string, error) {
 	request := sts.CreateAssumeRoleRequest()
 	request.RoleArn = roleArn
 	request.RoleSessionName = sessionName
@@ -303,13 +303,13 @@ func getAssumeRoleAK(accessKey, secretKey, region, roleArn, sessionName, policy 
 
 	client, err := sts.NewClientWithAccessKey(region, accessKey, secretKey)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	response, err := client.AssumeRole(request)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	return response.Credentials.AccessKeyId, response.Credentials.AccessKeySecret, nil
+	return response.Credentials.AccessKeyId, response.Credentials.AccessKeySecret, response.Credentials.SecurityToken, nil
 }
 
 func getSdkConfig() *sdk.Config {
