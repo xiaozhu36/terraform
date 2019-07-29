@@ -153,12 +153,13 @@ func assumeRoleSchema() *schema.Schema {
 					Type:        schema.TypeString,
 					Required:    true,
 					Description: "The ARN of a RAM role to assume prior to making API calls.",
+					DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_ASSUME_ROLE_ARN", ""),
 				},
 				"session_name": {
 					Type:        schema.TypeString,
 					Optional:    true,
-					Default:     "terraform",
 					Description: "The session name to use when assuming the role.",
+					DefaultFunc: schema.EnvDefaultFunc("ALICLOUD_ASSUME_ROLE_SESSION_NAME", "terraform"),
 				},
 				"policy": {
 					Type:        schema.TypeString,
@@ -168,9 +169,9 @@ func assumeRoleSchema() *schema.Schema {
 				"session_expiration": {
 					Type:         schema.TypeInt,
 					Optional:     true,
-					Default:      3600,
 					Description:  "The time after which the established session for assuming role expires.",
 					ValidateFunc: validation.IntBetween(900, 3600),
+					DefaultFunc:  schema.EnvDefaultFunc("ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION", 3600),
 				},
 			},
 		},
