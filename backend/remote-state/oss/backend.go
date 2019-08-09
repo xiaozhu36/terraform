@@ -185,7 +185,6 @@ func assumeRoleSchema() *schema.Schema {
 					Optional:     true,
 					Description:  "The time after which the established session for assuming role expires.",
 					ValidateFunc: validation.IntBetween(900, 3600),
-					DefaultFunc:  schema.EnvDefaultFunc("ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION", 3600),
 				},
 			},
 		},
@@ -264,6 +263,16 @@ func (b *Backend) configure(ctx context.Context) error {
 			}
 			policy = assumeRole["policy"].(string)
 			sessionExpiration = assumeRole["session_expiration"].(int)
+			if sessionExpiration == 0 {
+				if v := os.Getenv("ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION"); v != "" {
+					if expiredSeconds, err := strconv.Atoi(v); err == nil {
+						sessionExpiration = expiredSeconds
+					}
+				}
+				if sessionExpiration == 0 {
+					sessionExpiration = 3600
+				}
+			}
 		}
 	}
 
