@@ -16,6 +16,11 @@ This backend also supports state locking and consistency checking via
 [Alibaba Cloud Table Store](https://www.alibabacloud.com/help/doc-detail/27280.htm), which can be enabled by setting
 the `tablestore_table` field to an existing TableStore table name.
 
+-> **Note:** The OSS backend is available from terraform version 0.12.2.
+
+!> **Warning:** If you set `tablestore_table`, please ensure the table does not contain primary key named
+`LockID`, `Info` and `Digest`. Otherwise, there will throw an error `OTSParameterInvalid Duplicated attribute column ...`.
+
 ## Example Configuration
 
 ```hcl
