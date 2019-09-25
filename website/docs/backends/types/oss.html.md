@@ -83,6 +83,7 @@ The following configuration options or environment variables are supported:
  * `access_key` - (Optional) Alibaba Cloud access key. It supports environment variables `ALICLOUD_ACCESS_KEY` and  `ALICLOUD_ACCESS_KEY_ID`.
  * `secret_key` - (Optional) Alibaba Cloud secret access key. It supports environment variables `ALICLOUD_SECRET_KEY` and  `ALICLOUD_ACCESS_KEY_SECRET`.
  * `security_token` - (Optional) STS access token. It supports environment variable `ALICLOUD_SECURITY_TOKEN`.
+ * `ecs_role_name` - (Optional, Available in 0.12.10+) The RAM Role Name attached on a ECS instance for API operations. You can retrieve this from the 'Access Control' section of the Alibaba Cloud console.
  * `region` - (Optional) The region of the OSS bucket. It supports environment variables `ALICLOUD_REGION` and `ALICLOUD_DEFAULT_REGION`.
  * `endpoint` - (Optional) A custom endpoint for the OSS API. It supports environment variables `ALICLOUD_OSS_ENDPOINT` and `OSS_ENDPOINT`.
  * `bucket` - (Required) The name of the OSS bucket.
