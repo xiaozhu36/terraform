@@ -348,6 +348,12 @@ func initCommands(
 			}, nil
 		},
 
+		"resource list": func() (cli.Command, error) {
+			return &command.ResourceListCommand{
+				Meta: meta,
+			}, nil
+		},
+
 		//-----------------------------------------------------------
 		// Plumbing
 		//-----------------------------------------------------------
